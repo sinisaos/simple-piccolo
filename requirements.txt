@@ -1,0 +1,4 @@
+fastapi
+piccolo[sqlite]
+piccolo-admin
+uvicorn
