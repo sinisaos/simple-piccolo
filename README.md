@@ -1,4 +1,3 @@
-## Description:
 ``Simple-piccolo`` is a single-file application for quickly prototyping, exploring and testing ideas without any configuration, using Sqlite. The application use [FastAPI](https://fastapi.tiangolo.com/), [Piccolo ORM](https://piccolo-orm.readthedocs.io/en/latest/piccolo/getting_started/index.html) and [Piccolo Admin](https://piccolo-admin.readthedocs.io/en/latest/) for easy database interaction.
 
 ## How to use:
