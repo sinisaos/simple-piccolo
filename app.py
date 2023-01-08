@@ -53,7 +53,7 @@ app = FastAPI(
 
 # Routes example
 @app.get("/")
-async def root() -> JSONResponse:
+async def root() -> t.Dict[str, t.Any]:
     data = await Concert.select(
         Concert.all_columns(),
         Concert.band_1.id,
