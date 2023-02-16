@@ -1,5 +1,4 @@
 import asyncio
-import typing as t
 
 import uvicorn
 from fastapi import FastAPI
@@ -7,13 +6,13 @@ from fastapi.responses import JSONResponse
 from piccolo.apps.user.tables import BaseUser
 from piccolo.columns import ForeignKey, Varchar
 from piccolo.columns.readable import Readable
-from piccolo.engine.sqlite import SQLiteEngine
 from piccolo.table import Table
 from piccolo_admin.endpoints import create_admin
 from piccolo_api.session_auth.tables import SessionsBase
-from starlette.routing import Mount, Route
+from starlette.routing import Mount
 
 from piccolo_conf import DB
+
 
 # Tables example
 class Manager(Table, db=DB):
@@ -53,7 +52,7 @@ app = FastAPI(
 
 # Routes example
 @app.get("/")
-async def root() -> t.Dict[str, t.Any]:
+async def root() -> JSONResponse:
     data = await Concert.select(
         Concert.all_columns(),
         Concert.band_1.id,
