@@ -8,7 +8,6 @@ from litestar.exceptions import NotFoundException
 from litestar.types import Receive, Scope, Send
 from piccolo.apps.user.tables import BaseUser
 from piccolo.columns import Boolean, Varchar
-from piccolo.engine.sqlite import SQLiteEngine
 from piccolo.table import Table
 from piccolo_admin.endpoints import create_admin
 from piccolo_api.session_auth.tables import SessionsBase
