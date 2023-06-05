@@ -1,4 +1,5 @@
 fastapi
+litestar==2.0.0a3
 piccolo[sqlite]
 piccolo-admin
 uvicorn
