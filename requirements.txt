@@ -1,5 +1,6 @@
-fastapi
-litestar==2.0.0a3
+fastapi==0.99.1
+litestar
 piccolo[sqlite]
 piccolo-admin
+pydantic==1.10.11
 uvicorn
