@@ -1,13 +1,13 @@
 import asyncio
 
 import uvicorn
+from custom_admin_endpoints import create_admin
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from piccolo.apps.user.tables import BaseUser
 from piccolo.columns import ForeignKey, Varchar
 from piccolo.columns.readable import Readable
 from piccolo.table import Table
-from piccolo_admin.endpoints import create_admin
 from piccolo_api.session_auth.tables import SessionsBase
 from starlette.routing import Mount
 
@@ -44,6 +44,7 @@ app = FastAPI(
             "/admin/",
             create_admin(
                 tables=[Manager, Band, Concert],
+                allow_unauthenticated=True,
             ),
         )
     ],
