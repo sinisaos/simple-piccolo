@@ -2,40 +2,13 @@ import asyncio
 
 import uvicorn
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
 from piccolo.apps.user.tables import BaseUser
-from piccolo.columns import ForeignKey, Varchar
-from piccolo.columns.readable import Readable
-from piccolo.table import Table
-from piccolo_admin.endpoints import create_admin
 from piccolo_api.session_auth.tables import SessionsBase
 from starlette.routing import Mount
 
-from piccolo_conf import DB
-
-
-# Tables example
-class Manager(Table, db=DB):
-    name = Varchar(length=100)
-
-    @classmethod
-    def get_readable(cls) -> Readable:
-        return Readable(template="%s", columns=[cls.name])
-
-
-class Band(Table, db=DB):
-    name = Varchar(length=100)
-    manager = ForeignKey(references=Manager)
-
-    @classmethod
-    def get_readable(cls) -> Readable:
-        return Readable(template="%s", columns=[cls.name])
-
-
-class Concert(Table, db=DB):
-    band_1 = ForeignKey(references=Band)
-    band_2 = ForeignKey(references=Band)
-
+from custom_piccolo_admin import create_admin
+from tables.monitor_table import MonitorLog
+from tables.user_tables import Band, Concert, Manager
 
 # FastAPI app instantiation and mounting admin
 app = FastAPI(
@@ -43,29 +16,11 @@ app = FastAPI(
         Mount(
             "/admin/",
             create_admin(
-                tables=[Manager, Band, Concert],
+                tables=[Manager, MonitorLog, Band, Concert],
             ),
         )
     ],
 )
-
-
-# Routes example
-@app.get("/")
-async def root() -> JSONResponse:
-    data = await Concert.select(
-        Concert.all_columns(),
-        Concert.band_1.id,
-        Concert.band_1.name,
-        Concert.band_1.manager.id,
-        Concert.band_1.manager.name,
-        Concert.band_2.id,
-        Concert.band_2.name,
-        Concert.band_2.manager.id,
-        Concert.band_2.manager.name,
-    ).output(nested=True)
-
-    return JSONResponse({"data": data})
 
 
 async def main():
@@ -75,6 +30,7 @@ async def main():
     await Manager.create_table(if_not_exists=True)
     await Band.create_table(if_not_exists=True)
     await Concert.create_table(if_not_exists=True)
+    await MonitorLog.create_table(if_not_exists=True)
 
     # Creating admin user
     if not await BaseUser.exists().where(BaseUser.email == "admin@test.com"):
