@@ -1,0 +1,4 @@
+fastapi
+uvicorn
+piccolo[postgres]>=1.0.0
+piccolo_admin>=1.0.0
