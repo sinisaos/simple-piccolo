@@ -1,5 +1,5 @@
 import asyncio
-from typing import Annotated
+from typing import Annotated, Any
 
 import uvicorn
 from hypercorn.middleware import DispatcherMiddleware
@@ -35,6 +35,13 @@ class TaskModelOut(Struct):
     completed: bool = False
 
 
+# Check if the record is None. Use for query callback
+def check_record_not_found(result: dict[str, Any]) -> dict[str, Any]:
+    if result is None:
+        raise HTTPException(detail="Record not found", status=404)
+    return result
+
+
 # Service class
 class TaskService:
     async def list_tasks(self, limit: int, offset: int) -> list[TaskModelOut]:
@@ -51,10 +58,8 @@ class TaskService:
             await Task.select()
             .where(Task._meta.primary_key == task_id)
             .first()
+            .callback(check_record_not_found)
         )
-        if not task:
-            raise HTTPException(detail="Record not found", status=404)
-
         return TaskModelOut(**task)
 
     async def create_task(self, task_model: TaskModelIn) -> TaskModelOut:
@@ -65,10 +70,11 @@ class TaskService:
     async def update_task(
         self, task_id: int, task_model: TaskModelIn
     ) -> TaskModelOut:
-        task = await Task.objects().get(Task._meta.primary_key == task_id)
-        if not task:
-            raise HTTPException(detail="Record not found", status=404)
-
+        task = (
+            await Task.objects()
+            .get(Task._meta.primary_key == task_id)
+            .callback(check_record_not_found)
+        )
         for key, value in task_model.dict_converter().items():
             setattr(task, key, value)
 
@@ -76,10 +82,11 @@ class TaskService:
         return TaskModelOut(**task.to_dict())
 
     async def delete_task(self, task_id: int) -> None:
-        task = await Task.objects().get(Task._meta.primary_key == task_id)
-        if not task:
-            raise HTTPException(detail="Record not found", status=404)
-
+        task = (
+            await Task.objects()
+            .get(Task._meta.primary_key == task_id)
+            .callback(check_record_not_found)
+        )
         await task.remove()
 
 
