@@ -1,4 +1,5 @@
 fastapi
+lihil
 litestar
 piccolo[sqlite]
 piccolo-admin
