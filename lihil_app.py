@@ -90,38 +90,43 @@ class TaskService:
         await task.remove()
 
 
-# service instantiation
-service = TaskService()
-
 # root router
 root = Route()
 
 # task router
-task_route = Route("/tasks")
+task_route = Route("/tasks", deps=[TaskService])
 
 
 @task_route.get
-async def tasks(limit: int = 15, offset: int = 0) -> list[TaskModelOut]:
+async def tasks(
+    service: TaskService, limit: int = 15, offset: int = 0
+) -> list[TaskModelOut]:
     return await service.list_tasks(limit=limit, offset=offset)
 
 
 @task_route.sub("{task_id}").get
-async def task(task_id: int) -> TaskModelOut:
+async def task(service: TaskService, task_id: int) -> TaskModelOut:
     return await service.single_task(task_id=task_id)
 
 
 @task_route.post
-async def task_create(task_model: TaskModelIn) -> TaskModelOut:
+async def task_create(
+    service: TaskService, task_model: TaskModelIn
+) -> TaskModelOut:
     return await service.create_task(task_model=task_model)
 
 
 @task_route.sub("{task_id}").put
-async def task_update(task_id: int, task_model: TaskModelIn) -> TaskModelOut:
+async def task_update(
+    service: TaskService, task_id: int, task_model: TaskModelIn
+) -> TaskModelOut:
     return await service.update_task(task_id=task_id, task_model=task_model)
 
 
 @task_route.sub("{task_id}").delete
-async def task_delete(task_id: int) -> Annotated[Empty, 204]:
+async def task_delete(
+    service: TaskService, task_id: int
+) -> Annotated[Empty, 204]:
     await service.delete_task(task_id=task_id)
 
 
