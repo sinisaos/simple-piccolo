@@ -98,7 +98,19 @@ async def single_task(task_id: int) -> TaskModelOut:
 async def create_task(data: TaskModelIn) -> TaskModelOut:
     task = Task(**data.model_dump())
     await task.save()
-    return TaskModelOut(**task.to_dict())
+
+    all_columns: Any = Task.all_columns()
+    task_out = (
+        await Task.select(
+            all_columns,
+            Task.task_user.id,
+            Task.task_user.username,
+        )
+        .where(Task._meta.primary_key == task.id)
+        .first()
+        .output(nested=True)
+    )
+    return TaskModelOut(**task_out)
 
 
 @patch("/tasks/{task_id:int}", tags=["Task"])
@@ -114,7 +126,7 @@ async def update_task(task_id: int, data: TaskModelPartial) -> TaskModelOut:
     await task.save()
 
     all_columns: Any = Task.all_columns()
-    task = (
+    task_out = (
         await Task.select(
             all_columns,
             Task.task_user.id,
@@ -123,9 +135,8 @@ async def update_task(task_id: int, data: TaskModelPartial) -> TaskModelOut:
         .where(Task._meta.primary_key == task_id)
         .first()
         .output(nested=True)
-        .callback(check_record_not_found)
     )
-    return TaskModelOut(**task)
+    return TaskModelOut(**task_out)
 
 
 @delete("/tasks/{task_id:int}", tags=["Task"])
