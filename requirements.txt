@@ -1,6 +1,5 @@
 fastapi
-lihil
-litestar
+fastapi-jwt-auth3
 piccolo[sqlite]
 piccolo-admin
 pydantic
